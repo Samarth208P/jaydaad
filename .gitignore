@@ -19,7 +19,6 @@ test-results/
 
 # Private working documents and operator tools
 /docs/SUBMISSION.md
-/AI_USAGE.md
 /scripts/qday*
 /docs/audits/
 
