@@ -1,0 +1,14 @@
+{
+  "stage": "stage-1",
+  "status": "input-prepared-not-audited",
+  "preparedAt": "2026-11-14T11:54:26.324Z",
+  "sha256": "1bbabe8958e1264ec5804907d0eb18d86f09655f54ed7b2c161bed378bff1a29",
+  "source": "contracts/JaydaadEstate.sol",
+  "compiler": "0.8.30",
+  "evmVersion": "paris",
+  "optimizerRuns": 200,
+  "officialAuditor": "https://dashboard.qorechain.io/audit",
+  "reportUrl": null,
+  "findings": null,
+  "instructions": "Paste the exact adjacent Solidity source into QCAI. Preserve the public report URL and PDF. Resolve findings before stage-2. A code change requires a new source hash and re-audit."
+}

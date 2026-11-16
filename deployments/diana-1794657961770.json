@@ -1,0 +1,40 @@
+{
+  "chainId": 9800,
+  "network": "qorechain-diana",
+  "recordedAt": "2026-11-14T12:06:01.770Z",
+  "records": [
+    {
+      "lane": "native",
+      "action": "/qorechain.pqc.v1.MsgOpenEVMWindow",
+      "hash": "6EFF36499CE57F4E4EC4CCAEA391F22F54C78DA76E94AE31EA8B61176F3B91DF",
+      "block": 10072299,
+      "actor": "0xEc51F98bE92B264Afe581088A418845F7eFcf620",
+      "hybrid": true,
+      "time": "2026-11-14T12:05:54.382Z"
+    },
+    {
+      "lane": "evm",
+      "action": "deploy",
+      "hash": "0xe7987b2f54360140840b364cdeb274e40d1d05cd62ee19dd150d2e2a8fdaa9a5",
+      "block": 10072303,
+      "estate": "0xA3a1e281C4Cf7fD73b922a074f9e59e666503b10"
+    },
+    {
+      "lane": "native",
+      "action": "/qorechain.pqc.v1.MsgCloseEVMWindow",
+      "hash": "2798174399E0AD27435694E0E704515CB0E12979CCA378F9D36E87D29A07AE0C",
+      "block": 10072305,
+      "actor": "0xEc51F98bE92B264Afe581088A418845F7eFcf620",
+      "hybrid": true,
+      "time": "2026-11-14T12:06:01.769Z"
+    },
+    {
+      "estate": "0xA3a1e281C4Cf7fD73b922a074f9e59e666503b10",
+      "owner": "0xEc51F98bE92B264Afe581088A418845F7eFcf620",
+      "heir": "0x8dB04F66E2B781A3DA6F26784bA9B0676677cdF7",
+      "witness": "0xae24DeFE1011Ec7f9CFB74268f7a53633B38e3a6",
+      "interval": 2592000,
+      "grace": 604800
+    }
+  ]
+}

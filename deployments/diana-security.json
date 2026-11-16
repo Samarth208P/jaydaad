@@ -1,0 +1,33 @@
+{
+  "kind": "read-only-live-contract-simulations",
+  "chainId": 9800,
+  "network": "qorechain-diana",
+  "estate": "0xA3a1e281C4Cf7fD73b922a074f9e59e666503b10",
+  "positiveCheckinTransaction": "0x9194da507c3115d52fd4b706189e14e5d294feeaa6bf22728129c7430c8d620f",
+  "recordedAt": "2026-11-14T12:08:49.806Z",
+  "transactionBroadcast": false,
+  "checks": [
+    {
+      "name": "Classical key without participant PQ signature",
+      "passed": true,
+      "reason": "invalid approval"
+    },
+    {
+      "name": "Wrong transaction caller",
+      "passed": true,
+      "reason": "wrong caller"
+    },
+    {
+      "name": "Beneficiary claim before grace expiry",
+      "passed": true,
+      "reason": "claim unavailable"
+    },
+    {
+      "name": "Replay of the successful witnessed check-in",
+      "passed": true,
+      "reason": "invalid approval"
+    }
+  ],
+  "passed": true,
+  "note": "These are live eth_call simulations; they did not broadcast attack transactions or move funds."
+}

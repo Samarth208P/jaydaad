@@ -1,0 +1,36 @@
+{
+  "kind": "funded-registered-testnet-identities",
+  "network": "qorechain-diana",
+  "chainId": 9800,
+  "checkedAt": "2026-11-16T07:00:01.908Z",
+  "estateDeployment": "0xF98A128cc7764836c8E8c6c3EFBE5283cCea630D",
+  "accounts": {
+    "owner": {
+      "evm": "0xfE3d0C3a26998482134d57A435Fb9aE6B3BF502e",
+      "balanceQor": "12.8380757875",
+      "native": "qor1lc7scw3xnxzgyy6d27jrt7u6u6em75pw5vuzuz",
+      "pqcRegistered": true,
+      "possessionProven": true,
+      "algorithm": 1,
+      "publicKeyHash": "0xf28cc9b638d63d69e334f8241552daa5beaf2c95817503c8db3b35cffaecbff9"
+    },
+    "heir": {
+      "evm": "0x0e62bf0d2feC485995FdC72B2069AcfA35939D98",
+      "balanceQor": "1.82",
+      "native": "qor1pe3t7rf0a3y9n90acu4jq6dvlg6e88vcq53k7y",
+      "pqcRegistered": true,
+      "possessionProven": true,
+      "algorithm": 1,
+      "publicKeyHash": "0x487285c38e8728681a921a956dde0c4eac7abb89849fecec558a0803a832ffe2"
+    },
+    "witness": {
+      "evm": "0x26E6BC6CA1ca5d513bEbC7f77aed12F9Ed1942D8",
+      "balanceQor": "1.82",
+      "native": "qor1ymntcm9pefw4zwltclmh4mgjl8k3jskc6ldqvn",
+      "pqcRegistered": true,
+      "possessionProven": true,
+      "algorithm": 1,
+      "publicKeyHash": "0x221eb69b2ba6d941136bebf0b008520f04699d57efc214cdbe0419031dbbd458"
+    }
+  }
+}

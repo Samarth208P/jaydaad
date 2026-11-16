@@ -1,0 +1,29 @@
+{
+  "network": "qorechain-diana",
+  "chainId": 9800,
+  "heir": "0x8dB04F66E2B781A3DA6F26784bA9B0676677cdF7",
+  "vault": "0x91E8E55A52113D2Fdc2c3f13d3fC5A735632D4A4",
+  "balanceBeforeWei": "1820000000000000000",
+  "recordedBefore": "2026-11-14T12:11:08.596Z",
+  "status": "verified",
+  "claimHash": "0xd81e0c8a7f2be059cef84cefdcf006240828be05d60ccaf9fc048aff420897e7",
+  "block": 10072532,
+  "payoutWei": "250000000000000000",
+  "recipient": "0x8dB04F66E2B781A3DA6F26784bA9B0676677cdF7",
+  "balanceAfterWei": "1652296837500000000",
+  "expectedBalanceAfterWei": "1652296837500000000",
+  "evmFeeWei": "57703162500000000",
+  "nativeWindowFeesWei": "360000000000000000",
+  "nativeFeeReceipts": [
+    {
+      "hash": "4C13C147E36F0354EF48075C87C70ECECE5F473E294752B5408B56DE3E056F4B",
+      "amountUqor": "180000"
+    },
+    {
+      "hash": "7F7D917E000E470FFFC3FA1DD9F20BB8A5786E4AB453DB389116D3969B0D15CC",
+      "amountUqor": "180000"
+    }
+  ],
+  "checkedAt": "2026-11-14T12:12:12.348Z",
+  "explanation": "Heir balance after = balance before + vault payout - EVM claim gas - native window open/close fees."
+}

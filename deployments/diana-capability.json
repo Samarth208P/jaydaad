@@ -1,0 +1,14 @@
+{
+  "kind": "read-only-capability-probe",
+  "recordedAt": "2026-11-14T11:56:20.371Z",
+  "network": "qorechain-diana",
+  "chainId": 9800,
+  "rpc": "https://evm-testnet.qore.host",
+  "block": 10071897,
+  "registryResponds": true,
+  "validSignatureAccepted": true,
+  "alteredMessageRejected": true,
+  "transactionBroadcast": false,
+  "estateDeployment": null,
+  "note": "This proves a live precompile capability check, not a deployed estate or a QoreX transaction."
+}
