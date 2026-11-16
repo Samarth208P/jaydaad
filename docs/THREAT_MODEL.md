@@ -51,14 +51,13 @@ after claim opens; one-time payout; native deposits after closure; direct EVM
 funding restrictions; six-decimal amount conversion; single-target scoped-window
 encoding; mainnet selection refusal; wallet rejection with no false success.
 
-The browser attack lab uses an isolated Hardhat snapshot. It is not the official
-Q-Day Drill and does not attack the public network.
+The contract test suite runs on an isolated Hardhat network. Browser tests use a wallet test double.
 
 ## Trust assumptions and unresolved risks
 
-- The witness is honest and available and performs a real identity/liveness
-  check. The prototype simulates this check. It does not verify death, a legal
-  document, biometric identity, or AI impersonation.
+- The witness must stay available and identify the participant before signing.
+  The contract checks the witness signature. Identity checks, legal documents,
+  and evidence of death are outside the application.
 - An attacker with both the participant PQ key and witness cooperation/key can
   authorize a sensitive action during the applicable phase. Quantum resistance
   is not protection against loss of both signing secrets.
@@ -69,12 +68,9 @@ Q-Day Drill and does not attack the public network.
 - The chain's registry, precompiles, hybrid validation, clocks, and RPC are
   trusted. An RPC can misreport state or censor the interface. Final receipts
   should also be checked through an independent node/explorer.
-- Vault existence, roles, funding, and deadlines are public. This is not private
-  inheritance, an encrypted document store, or an integration with QoreSeal.
-- The local rehearsal server holds all three disposable identities. It binds to
-  loopback, checks Host and Origin, and must not be exposed as a public service.
-  It never accepts testnet secret keys. The CLI config is a single-operator
-  testnet harness; independent human custody is a separate operational design.
+- Vault existence, roles, funding, and deadlines are public. Handover notes are encrypted off-chain for the beneficiary. Anyone with the recipient key and file can read them immediately. The encrypted file carries no proof of authorship. Key loss can make old notes unreadable.
+- Handle lookup depends on the pinned registry key and a verified owner signature. The owner reviews the resulting EVM address before using it. The contract stores the address for the life of the vault.
+- The read-only gateway binds to loopback. The CLI configuration can hold all three test identities on one device. Independent custody requires each role to control its own keys.
 - QoreX discovery names can be spoofed by another extension. Install from the
   official store; inspect the actual recipient, amount, and network in its prompt.
 - The deployed-runtime comparison masks Solidity immutable byte ranges and
@@ -88,8 +84,4 @@ Q-Day Drill and does not attack the public network.
 
 ## Before any real-asset release
 
-Independent contract and operational security reviews; recovery and key rotation;
-real liveness integration; notification delivery; multiple-beneficiary design;
-private instructions; griefing and rejecting-recipient tests; browser-extension
-interoperability validation; reproducible public testnet receipts; and both QCAI
-stages with resolved findings.
+Independent contract and operational review, a tested recovery and rotation process, a reliable witness workflow, and browser-wallet interoperability testing are prerequisites for considering broader use.

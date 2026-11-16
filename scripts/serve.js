@@ -1,5 +1,7 @@
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
+import { fetchMlkemPublicKey } from '@qorechain/qoreseal/network';
+import { resolveRoleHandle } from './handles.js';
 import { formatEther, parseEther, isAddress } from 'ethers';
 import { buildProject } from './build.js';
 import { networkHealth, readVault, readJson, readReceipt, keyStatus, provider } from './network.js';
@@ -11,7 +13,7 @@ const host = '127.0.0.1';
 const origin = `http://${host}:${port}`;
 const files = new Map([['/', ['web/index.html', 'text/html']], ['/app.js', ['dist/app.js', 'text/javascript']],
   ['/style.css', ['web/style.css', 'text/css']], ['/favicon.svg', ['web/favicon.svg', 'image/svg+xml']],
-  ['/cover.svg', ['docs/cover.svg', 'image/svg+xml']],
+  ['/cover.png', ['docs/cover-jaydaad-ui.png', 'image/png']],
   ['/qorex-icon.png', ['web/qorex-icon.png', 'image/png']],
   ['/fonts/manrope.woff2', ['node_modules/@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2', 'font/woff2']]]);
 const server = http.createServer(async (req, res) => {
@@ -29,6 +31,16 @@ const server = http.createServer(async (req, res) => {
         return res.end(await readFile(file));
       }
       if (url.pathname === '/api/network') return json(200, await networkHealth());
+      if (url.pathname.startsWith('/api/handles/')) {
+        return json(200, await resolveRoleHandle(url.pathname.slice('/api/handles/'.length)));
+      }
+      if (url.pathname.startsWith('/api/encryption-key/')) {
+        const address = url.pathname.slice('/api/encryption-key/'.length);
+        if (!/^qor1[a-z0-9]{38}$/.test(address)) throw Error('Enter a Diana account address.');
+        const key = await fetchMlkemPublicKey({ rest: 'https://api-testnet.qore.host', address,
+          fetch: url => fetch(url, { signal: AbortSignal.timeout(8000) }) });
+        return json(200, { publicKey: '0x' + Buffer.from(key).toString('hex') });
+      }
       if (url.pathname === '/api/artifact') return json(200, artifact);
       if (url.pathname === '/api/deployment') {
         try {

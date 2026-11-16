@@ -9,11 +9,12 @@ import { EthNativeSigner, unifiedAccountFromSeed, openEvmWindowMsg, closeEvmWind
   buildRegisterPqcKeyMsg, signProofOfPossession } from '@qorechain/sdk';
 import { DIANA, provider, networkHealth, readJson, keyStatus, readVault } from './network.js';
 import { buildProject } from './build.js';
+import { broadcastOnce } from './native-payment.js';
 
 const { values: options, positionals } = parseArgs({ allowPositionals: true, options: {
   config: { type: 'string', default: '.local/diana.json' }, vault: { type: 'string' }, action: { type: 'string' },
   amount: { type: 'string' }, 'register-keys': { type: 'boolean', default: false },
-  'export-proof': { type: 'string' }, help: { type: 'boolean', short: 'h' }
+  'export-proof': { type: 'string' }, 'record-hash': { type: 'string' }, help: { type: 'boolean', short: 'h' }
 } });
 const command = positionals[0] || options.action || 'status';
 const configPath = resolve(options.config);
@@ -46,14 +47,14 @@ async function init() {
   out(JSON.stringify(accounts, null, 2));
   out('For independent custody, move each role’s two key files to its own device and update the file paths.');
 }
-async function load() {
+async function load(roles) {
   let config;
   try { config = JSON.parse(await readFile(configPath, 'utf8')); }
   catch (e) { if (e.code === 'ENOENT') throw Error('No private configuration. Run: npm run estate -- init. Read docs/TESTNET.md.'); throw e; }
   if (config.network !== DIANA.nativeChainId) throw Error('Configuration must explicitly name qorechain-diana. Mainnet is disabled.');
   if (!Number.isInteger(config.interval) || !Number.isInteger(config.grace) || config.interval < 60 || config.grace < 60 || config.interval > 31536000 || config.grace > 31536000) throw Error('Use integer timer values between 60 and 31536000 seconds.');
   const accounts = {};
-  for (const role of ['owner', 'heir', 'witness']) {
+  for (const role of roles) {
     const record = config.accounts?.[role];
     if (!record?.classicalKeyFile || !record?.pqEntropyFile) throw Error(`Missing ${role} key file references.`);
     const key = (await readFile(resolve(dirname(configPath), record.classicalKeyFile), 'utf8')).trim();
@@ -61,17 +62,18 @@ async function load() {
     if (!/^(0x)?[a-f\d]{64}$/i.test(key) || !/^[a-f\d]{64}$/i.test(entropy)) throw Error(`Invalid ${role} key file format.`);
     accounts[role] = unifiedAccountFromSeed(getBytes(key.startsWith('0x') ? key : '0x' + key), { pqcSecret: getBytes('0x' + entropy) });
   }
-  if (new Set(Object.values(accounts).map(a => a.evm)).size !== 3) throw Error('Owner, heir, and witness must be distinct.');
+  if (new Set(Object.values(accounts).map(a => a.evm)).size !== roles.length) throw Error('Owner, heir, and witness must be distinct.');
   return { config, accounts };
 }
-async function native(account, message, classical = false) {
+async function native(account, message, classical = false, recordHash) {
   transport ||= await StargateClient.connect('https://rpc-testnet.qore.host');
   const auth = await readJson('/cosmos/auth/v1beta1/accounts/' + account.cosmos);
   let base = auth.account;
   for (let i = 0; i < 5 && base?.account_number === undefined; i++) base = base?.base_account || base?.base_vesting_account || base?.baseAccount;
   if (!base?.account_number || base.sequence === undefined) throw Error('Account is not funded/initialized on Diana. Use the faucet first.');
   const signer = new EthNativeSigner(account, { signMode: classical ? 'classical' : 'hybrid', rest: DIANA.rest });
-  const result = await signer.signAndBroadcast(transport, { chainId: DIANA.nativeChainId,
+  const broadcaster = recordHash ? { broadcastTx: bytes => broadcastOnce(transport, bytes, recordHash) } : transport;
+  const result = await signer.signAndBroadcast(broadcaster, { chainId: DIANA.nativeChainId,
     accountNumber: BigInt(base.account_number), sequence: BigInt(base.sequence), messages: [message],
     fee: { gas: '1800000', amount: [{ denom: 'uqor', amount: '180000' }] }, memo: 'Jaydaad inheritance vault' });
   if (result.code !== 0) throw Error(`Native transaction failed: ${result.rawLog || result.code}`);
@@ -106,11 +108,12 @@ async function withWindow(account, target, fn) {
   }
 }
 async function run() {
+  if (options['record-hash'] && command !== 'fund-native') throw Error('--record-hash is only supported for fund-native.');
   if (options.help) { out('Commands: init, status, bootstrap, deploy, checkin, cancel, claim, fund, fund-native, recover. See docs/TESTNET.md.'); return; }
   if (command === 'init') return init();
   if (!['status', 'bootstrap', 'deploy', 'checkin', 'cancel', 'claim', 'fund', 'fund-native', 'recover'].includes(command)) throw Error('Unknown command. Use --help.');
   await networkHealth();
-  const { config, accounts } = await load();
+  const { config, accounts } = await load(command === 'fund-native' ? ['owner'] : ['owner', 'heir', 'witness']);
   if (command === 'status') {
     for (const [role, a] of Object.entries(accounts)) out(JSON.stringify({ role, evm: a.evm, native: a.cosmos,
       balance: (await provider.getBalance(a.evm)).toString(), key: await keyStatus(a.evm) }));
@@ -151,19 +154,20 @@ async function run() {
   const vault = await readVault(options.vault, artifact.abi);
   const actor = command === 'claim' ? accounts.heir : accounts.owner;
   const expectedRole = command === 'claim' ? vault.heir : vault.owner;
-  if (actor.evm.toLowerCase() !== expectedRole.toLowerCase() || accounts.witness.evm.toLowerCase() !== vault.witness.toLowerCase()) throw Error('Configuration participants do not match this vault.');
+  if (actor.evm.toLowerCase() !== expectedRole.toLowerCase()) throw Error('Configured sender does not match this vault.');
   if (command === 'fund-native') {
     if (vault.phase !== 'Active') throw Error('Native funding requires an active vault at preflight.');
     if (!options.amount || !/^(0|[1-9]\d{0,7})(\.\d{1,6})?$/.test(options.amount) || parseEther(options.amount) <= 0n) throw Error('Provide a positive --amount with at most six decimals.');
     const { parseUnits } = await import('ethers');
     const { evmToQor } = await import('@qorechain/sdk');
     const record = await native(actor, bank.send({ fromAddress: actor.cosmos, toAddress: evmToQor(vault.estate),
-      amount: [{ denom: 'uqor', amount: parseUnits(options.amount, 6).toString() }] }));
+      amount: [{ denom: 'uqor', amount: parseUnits(options.amount, 6).toString() }] }), false, options['record-hash']);
     record.estate = vault.estate; record.amountQor = options.amount; record.purpose = 'fund-vault-native';
     const after = await readVault(vault.estate, artifact.abi);
     out('Vault native funding confirmed. Actual EVM balance: ' + after.balance + ' QOR');
     return;
   }
+  if (accounts.witness.evm.toLowerCase() !== vault.witness.toLowerCase()) throw Error('Configured witness does not match this vault.');
   await withWindow(actor, vault.estate, async () => {
     const estate = new Contract(vault.estate, artifact.abi, new Wallet(actor.privateKey, provider));
     if (command === 'fund') {

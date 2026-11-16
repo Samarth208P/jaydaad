@@ -152,8 +152,8 @@ h3 { font-size: 15px; line-height: 1.4 }
 .panel-header { margin-bottom: 16px }
 .panel-header p,.page-heading p,.checkin-panel>p,.body-copy,.help-content p,.guide-step p,.risk-grid p,.security-intro p { margin-top: 7px; color: var(--muted); line-height: 1.6 }
 .tag { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line); color: var(--fern); border-radius: 4px; padding: 2px 6px; font-size: 10px; text-transform: uppercase; letter-spacing: .09em; white-space: nowrap }
-.vault-title-row,.person-row,.empty-activity,.event-cell,.drill-check,.key-row,.key-role { display: flex; align-items: center; gap: 12px }
-.vault-title-row p,.vault-footnote,.vault-details span,.person-row p,.empty-activity p,.event-cell p,.key-row small,.drill-check p { color: var(--muted); font-size: 12px; line-height: 1.5 }
+.vault-title-row,.person-row,.empty-activity,.event-cell,.key-row,.key-role { display: flex; align-items: center; gap: 12px }
+.vault-title-row p,.vault-footnote,.vault-details span,.person-row p,.empty-activity p,.event-cell p,.key-row small { color: var(--muted); font-size: 12px; line-height: 1.5 }
 .vault-avatar,.person-avatar,.empty-icon,.event-icon,.path-icon,.security-emblem,.empty-state-icon { display: inline-grid; place-items: center; flex: none; width: 34px; height: 34px; background: #e7eee8; color: var(--fern); border-radius: 8px }
 .vault-amount { font-size: 34px; color: var(--ink); letter-spacing: -.05em; margin: 12px 0; line-height: 1.15 }
 .vault-details { display: flex; flex-wrap: wrap; gap: 10px 24px; border-block: 1px solid var(--line); padding: 12px 0; margin-bottom: 14px }
@@ -193,13 +193,13 @@ h3 { font-size: 15px; line-height: 1.4 }
 .detail-list>div,.window-limits>div { display: grid; grid-template-columns: minmax(115px,.7fr) minmax(0,1fr); gap: 12px; border-bottom: 1px dotted var(--line); padding: 10px 0; align-items: baseline }
 dt,.body-copy,.key-role { color: var(--muted) }
 dd { margin: 0; overflow-wrap: anywhere }
-.address-wrap,pre,code,.key-row small,.drill-check p { overflow-wrap: anywhere; word-break: break-word }
+.address-wrap,pre,code,.key-row small { overflow-wrap: anywhere; word-break: break-word }
 .address-wrap,pre,code { font-family: var(--mono); font-size: 12px }
 .icon-btn { width: 32px; height: 32px; border-radius: 6px; display: inline-grid; place-items: center; flex: none }
 .icon-btn:hover { background: var(--wash) }
-.inline-note,.error-banner,.mode-notice,.drill-empty { display: flex; align-items: flex-start; gap: 10px; padding: 12px; background: #eff3ee; border: 1px solid var(--line); border-radius: 8px; margin: 12px 0; font-size: 13px; line-height: 1.55 }
+.inline-note,.error-banner,.mode-notice { display: flex; align-items: flex-start; gap: 10px; padding: 12px; background: #eff3ee; border: 1px solid var(--line); border-radius: 8px; margin: 12px 0; font-size: 13px; line-height: 1.55 }
 .error-banner,.mode-notice { align-items: center; margin-bottom: 18px }
-.error-banner span,.mode-notice span,.drill-empty span { flex: 1 }
+.error-banner span,.mode-notice span { flex: 1 }
 .error-banner button,.mode-notice button { color: var(--fern); text-decoration: underline }
 .error-banner,.form-error { color: #75482c }
 .button-row,.guide-links { margin-top: 16px }
@@ -223,8 +223,8 @@ th { font: 12px var(--mono); color: var(--muted) }
 .inline-form input,.amount-input input { flex: 1 }
 .security-intro { display: flex; align-items: flex-start; gap: 15px; padding: 20px; background: #e5eee6; border-radius: 12px; margin-bottom: 18px }
 .security-emblem { flex: none; margin: 0; background: #cde3d2 }
-.key-row,.drill-check { padding: 12px 0; border-bottom: 1px dotted var(--line) }
-.key-row>div,.drill-check>div { flex: 1; min-width: 0 }
+.key-row { padding: 12px 0; border-bottom: 1px dotted var(--line) }
+.key-row>div { flex: 1; min-width: 0 }
 .key-role { flex-wrap: wrap; font-size: 12px }
 .risk-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px }
 .risk-grid h3 { margin: 8px 0 }
@@ -304,7 +304,7 @@ input[readonly] { background: var(--wash) }
   .risk-grid { grid-template-columns: 1fr }
   .security-intro { flex-wrap: wrap }
   .page-footer { font-size: 11px; gap: 8px }
-  .mode-notice,.error-banner,.drill-empty { flex-wrap: wrap }
+  .mode-notice,.error-banner { flex-wrap: wrap }
   .panel-header { flex-wrap: wrap }
   .inline-form { flex-wrap: wrap }
   .detail-list>div { grid-template-columns: minmax(88px,.6fr) 1fr }

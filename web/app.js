@@ -1,5 +1,6 @@
 import { api, connectQorex, disconnectQorex, walletState, fundVault, openWindow, closeWindow, deployVault,
   executeProof, toNative, explorerTx, explorerAddress, WALLET_URL, FAUCET_URL } from './wallet.js';
+import { encryptHandover } from './handover.js';
 import { compactInformation } from './info.js';
 import { startCoverMotion, mountPageMotion, mountMapMotion, refreshScrollPositions } from './motion.js';
 
@@ -17,7 +18,7 @@ const countdown = sec => {
 function stored(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
 function save(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
 const S = { mode: 'testnet', route: location.hash.slice(1) || 'overview', vault: null,
-  wallet: null, network: null, networkError: '', busy: false, drawer: false, drill: null, receiptResult: '',
+  wallet: null, network: null, networkError: '', busy: false, drawer: false, receiptResult: '',
   liveEvents: stored('jaydaad.transactions', []), chainEvents: [], metadata: stored('jaydaad.vault', null) };
 const paths = {
   home: '<path d="m3 10 9-7 9 7v10H3Z"/><path d="M9 20v-7h6v7"/>',
@@ -219,7 +220,7 @@ function vaultPage() {
 }
 function beneficiaries() {
   const v = S.vault;
-  return `${heading('The people in your plan.', 'Clear roles. Independent approvals. No surprises.')}${v ? `<section class="panel beneficiary-panel"><div class="panel-header"><h2>Your beneficiary</h2>${tag('Single-beneficiary vault')}</div><div class="person-row"><span class="person-avatar heir">${icon('people')}</span><div><h3>${escape(v.heirName || 'Your beneficiary')}</h3><p class="address-wrap">${escape(v.heir)}</p>${button(v.heirName ? 'Edit beneficiary name' : 'Add beneficiary name', 'name-beneficiary', 'small secondary')}</div><div class="allocation"><strong>100<span>%</span></strong><small>of the vault balance</small></div></div><div class="inline-note">${icon('leaf')}Your beneficiary can claim only after your check-in interval and grace period expire, with a separate witness approval.</div></section><section class="panel"><div class="panel-header"><h2>Your independent witness</h2>${tag(v.keys?.[2]?.proven && v.keys?.[2]?.pinned ? 'Key verified' : 'Key needs attention', v.keys?.[2]?.pinned ? 'green' : 'peach')}</div><div class="person-row"><span class="person-avatar witness">${icon('shield')}</span><div><h3>${escape(v.witnessName || 'Independent witness')}</h3><p class="address-wrap">${escape(v.witness)}</p></div></div><p class="body-copy">The witness verifies the intended person before co-signing a check-in, cancellation, or claim. The contract checks their signature. It does not verify liveness or a legal death certificate.</p><div class="inline-note">${icon('info')}Choose someone independent. Losing their key or their cooperation can prevent a payout. Witness succession is not implemented in this prototype.</div></section>` : emptyState('people', 'Leave a little peace of mind', 'Your plan has one beneficiary and one independent witness. Add their registered addresses when you create a vault.', 'Create a vault', 'create')}`;
+  return `${heading('The people in your plan.', 'Clear roles. Independent approvals. No surprises.')}${v ? `<section class="panel beneficiary-panel"><div class="panel-header"><h2>Your beneficiary</h2>${tag('Single-beneficiary vault')}</div><div class="person-row"><span class="person-avatar heir">${icon('people')}</span><div><h3>${escape(v.heirName || 'Your beneficiary')}</h3><p class="address-wrap">${escape(v.heir)}</p>${button(v.heirName ? 'Edit beneficiary name' : 'Add beneficiary name', 'name-beneficiary', 'small secondary')}</div><div class="allocation"><strong>100<span>%</span></strong><small>of the vault balance</small></div></div><div class="inline-note">${icon('leaf')}Your beneficiary can claim only after your check-in interval and grace period expire, with a separate witness approval.</div>${button('Create private handover note', 'handover-note', 'secondary', 'lock')}</section><section class="panel"><div class="panel-header"><h2>Your independent witness</h2>${tag(v.keys?.[2]?.proven && v.keys?.[2]?.pinned ? 'Key verified' : 'Key needs attention', v.keys?.[2]?.pinned ? 'green' : 'peach')}</div><div class="person-row"><span class="person-avatar witness">${icon('shield')}</span><div><h3>${escape(v.witnessName || 'Independent witness')}</h3><p class="address-wrap">${escape(v.witness)}</p></div></div><p class="body-copy">The witness verifies the intended person before co-signing a check-in, cancellation, or claim. The contract checks their signature. It does not verify liveness or a legal death certificate.</p><div class="inline-note">${icon('info')}Choose someone independent. Losing their key or their cooperation can prevent a payout. Witness succession is not implemented in this prototype.</div></section>` : emptyState('people', 'Leave a little peace of mind', 'Your plan has one beneficiary and one independent witness. Add their registered addresses when you create a vault.', 'Create a vault', 'create')}`;
 }
 function activityTable(list) {
   if (!list.length) return `<div class="empty-activity"><span class="empty-icon">${icon('activity')}</span><div><strong>A clear record starts here</strong><p>Check-ins, funding, and claims will appear as you use your vault.</p></div></div>`;
@@ -233,10 +234,10 @@ function securityPage() {
   return `${heading('Care deserves a second signature.', 'Review who can act, what they can do, and where the boundaries are.')}<section class="security-intro"><span class="security-emblem">${icon('shield')}</span><div><h2>Two approvals. One very personal plan.</h2><p>A sensitive vault action requires the participant’s transaction, their ML-DSA-87 signature, and a separate witness signature. A stolen classical key alone cannot supply these approvals.</p></div>${tag('ML-DSA-87', 'violet')}</section>
     <div class="two-column"><section class="panel"><div class="panel-header"><h2>Enrolled keys</h2>${tag(v ? '3 participants' : 'Not enrolled')}</div>${['Owner', 'Beneficiary', 'Witness'].map((role, i) => { const k = v?.keys?.[i]; return `<div class="key-row"><span class="key-role">${icon(i === 2 ? 'shield' : 'people')}${role}</span><div><strong>${k ? short(k.address) : 'Not added'}</strong><small>${k?.proven && k?.pinned ? 'Possession proven · pinned key matches' : k ? 'Registry key no longer matches' : 'Create or attach a vault first'}</small></div>${k?.proven && k?.pinned ? icon('check', 'green-text') : icon('lock', 'muted')}</div>`; }).join('')}<p class="body-copy small-copy">The contract checks the live registry on every approval. Rotated or revoked pinned keys cannot approve new actions.</p></section>
     <section class="panel"><div class="panel-header"><h2>QoreX authorization window</h2>${tag(scoped?.live || S.wallet?.window?.live ? 'Open' : 'Closed', scoped?.live ? 'green' : '')}</div><p class="body-copy">Authorize a short EVM session for this vault only. Opening and closing are hybrid-signed QoreX native transactions.</p><dl class="window-limits"><div><dt>Target</dt><dd>${v ? short(v.estate) : 'Attach a Diana vault'}</dd></div><div><dt>Maximum transactions</dt><dd>3</dd></div><div><dt>Maximum value + fees</dt><dd>1 test QOR</dd></div><div><dt>Expires after</dt><dd>100 blocks</dd></div></dl>${scope.length ? `<p class="small-copy address-wrap">Current scope: ${scope.map(escape).join(', ')}</p>` : ''}<div class="button-row">${button('Open scoped window', 'open-window', 'primary', 'lock', (!v) || !S.wallet)}${button('Close window', 'close-window', 'secondary', '', (!S.wallet))}</div><p class="small-copy muted">A native funding transfer does not need an EVM window. The window above applies to your connected native account’s matching 0x address.</p></section></div>
-    <section class="panel"><div class="panel-header"><h2>What this prototype still depends on</h2></div><div class="risk-grid"><div>${icon('people')}<h3>A trustworthy witness</h3><p>Liveness checks happen outside the contract. This app does not detect death, impersonation, or AI-generated identity.</p></div><div>${icon('lock')}<h3>Long-term key access</h3><p>Key recovery, witness succession, and cryptographic migration need a reviewed recovery design before real use.</p></div><div>${icon('book')}<h3>Independent review</h3><p>Official QCAI audit reports are pending.</p></div></div></section>`;
+    <section class="panel"><div class="panel-header"><h2>What this prototype still depends on</h2></div><div class="risk-grid"><div>${icon('people')}<h3>A trustworthy witness</h3><p>Liveness checks happen outside the contract. This app does not detect death, impersonation, or AI-generated identity.</p></div><div>${icon('lock')}<h3>Long-term key access</h3><p>Key recovery, witness succession, and cryptographic migration need a reviewed recovery design before real use.</p></div><div>${icon('book')}<h3>Independent review</h3><p>This testnet release has no published independent security audit.</p></div></div></section>`;
 }
 function guidePage() {
-  return `${heading('A little guidance goes a long way.', 'A practical path from your first connection to a working inheritance plan.')}<section class="panel guide-panel"><div class="guide-step"><span>1</span><div><h2>Connect QoreX on Diana</h2><p>Install QoreX, choose the Diana testnet inside the wallet, and connect. Jaydaad uses the native provider’s hybrid <code>signAndBroadcast</code> path. Private keys stay in the wallet.</p><div class="button-row">${button(S.wallet ? 'View connected wallet' : 'Connect QoreX', S.wallet ? 'wallet' : 'connect', 'primary', 'wallet')}${link('Install QoreX', WALLET_URL, 'text-link')}</div></div></div><div class="guide-step"><span>2</span><div><h2>Get a little test QOR</h2><p>The official faucet supplies valueless Diana QOR. Native transfers use <code>uqor</code> (6 decimals); EVM contract balances use 18 decimals. Jaydaad converts amounts before building the message.</p>${link('Open the official faucet', FAUCET_URL, 'text-link')}</div></div><div class="guide-step"><span>3</span><div><h2>Deploy and attach your vault</h2><p>Choose distinct owner, beneficiary, and witness addresses with possession-proven ML-DSA-87 keys. Choose your check-in interval and grace period. Deploy the compiled contract on chain 9800, then attach its address here.</p><div class="inline-note">${icon('info')}Current QoreX releases support native payments and window transactions but do not yet support EVM sends or arbitrary PQ message signing. Use the documented deployment and approval CLI for contract actions. The app never substitutes a simulated success.</div><div class="button-row">${button('Attach a Diana vault', 'attach', 'secondary', 'vault')}${button('Deployment instructions', 'deployment-help', 'secondary', 'book')}</div></div></div><div class="guide-step"><span>4</span><div><h2>Start the clock, then fund with QoreX</h2><p>Complete a participant-and-witness check-in to activate the vault. Then send test QOR from QoreX to the vault’s native address. Jaydaad checks the receipt and refreshes the actual contract balance.</p></div></div><div class="guide-step"><span>5</span><div><h2>Check in, return during grace, or hand over</h2><p>A witnessed check-in restarts the clock. A missed check-in opens grace. After grace, only the beneficiary with witness approval can claim. These boundaries use block time, without a keeper.</p></div></div></section><section class="guide-links">${link('Developer Fest rules', 'https://build.qorechain.io/rules', 'text-link')}${link('QoreX integration guide', 'https://docs.qorechain.io/developer-tools/qorex-integrations', 'text-link')}${link('Diana EVM windows', 'https://docs.qorechain.io/developer-guide/evm-window-reference', 'text-link')}</section>`;
+  return `${heading('A little guidance goes a long way.', 'A practical path from your first connection to a working inheritance plan.')}<section class="panel guide-panel"><div class="guide-step"><span>1</span><div><h2>Connect QoreX on Diana</h2><p>Install QoreX, choose the Diana testnet inside the wallet, and connect. Jaydaad uses the native provider’s hybrid <code>signAndBroadcast</code> path. Private keys stay in the wallet.</p><div class="button-row">${button(S.wallet ? 'View connected wallet' : 'Connect QoreX', S.wallet ? 'wallet' : 'connect', 'primary', 'wallet')}${link('Install QoreX', WALLET_URL, 'text-link')}</div></div></div><div class="guide-step"><span>2</span><div><h2>Get a little test QOR</h2><p>The official faucet supplies valueless Diana QOR. Native transfers use <code>uqor</code> (6 decimals); EVM contract balances use 18 decimals. Jaydaad converts amounts before building the message.</p>${link('Open the official faucet', FAUCET_URL, 'text-link')}</div></div><div class="guide-step"><span>3</span><div><h2>Deploy and attach your vault</h2><p>Choose distinct owner, beneficiary, and witness addresses with possession-proven ML-DSA-87 keys. Choose your check-in interval and grace period. Deploy the compiled contract on chain 9800, then attach its address here.</p><div class="inline-note">${icon('info')}Current QoreX releases support native payments and window transactions but do not yet support EVM sends or arbitrary PQ message signing. Use the documented deployment and approval CLI for contract actions. The app never substitutes a simulated success.</div><div class="button-row">${button('Attach a Diana vault', 'attach', 'secondary', 'vault')}${button('Deployment instructions', 'deployment-help', 'secondary', 'book')}</div></div></div><div class="guide-step"><span>4</span><div><h2>Start the clock, then fund with QoreX</h2><p>Complete a participant-and-witness check-in to activate the vault. Then send test QOR from QoreX to the vault’s native address. Jaydaad checks the receipt and refreshes the actual contract balance.</p></div></div><div class="guide-step"><span>5</span><div><h2>Check in, return during grace, or hand over</h2><p>A witnessed check-in restarts the clock. A missed check-in opens grace. After grace, only the beneficiary with witness approval can claim. These boundaries use block time, without a keeper.</p></div></div></section><section class="guide-links">${link('QoreX integration guide', 'https://docs.qorechain.io/developer-tools/qorex-integrations', 'text-link')}${link('Diana EVM windows', 'https://docs.qorechain.io/developer-guide/evm-window-reference', 'text-link')}</section>`;
 }
 function settingsPage() { return `${heading('Your workspace, at a glance.', 'Connection details and local records for this device.')}<section class="panel"><div class="panel-header"><h2>Network</h2>${tag('Diana only', 'violet')}</div><dl class="detail-list"><div><dt>Native chain</dt><dd>qorechain-diana</dd></div><div><dt>EVM chain ID</dt><dd>9800</dd></div><div><dt>Currency</dt><dd>Testnet QOR (no monetary value)</dd></div><div><dt>RPC</dt><dd class="address-wrap">https://evm-testnet.qore.host</dd></div><div><dt>Latest observed block</dt><dd>${S.network ? number(S.network.block) : 'Unavailable'}</dd></div><div><dt>Workspace mode</dt><dd>${('Public Diana testnet')}</dd></div></dl>${button('Refresh Diana state', 'refresh', 'secondary')}</section><section class="panel"><div class="panel-header"><h2>Wallet & local data</h2></div><p class="body-copy">Vault labels and this browser’s transaction receipts are saved on this device. No secret keys are stored in the app. Clearing local records does not delete a vault or move any funds.</p><div class="button-row">${button(S.wallet ? 'Disconnect QoreX' : 'Connect QoreX', S.wallet ? 'disconnect' : 'connect', 'secondary', 'wallet')}${button('Export public records', 'export', 'secondary', 'download')}${button('Clear browser records', 'clear', 'danger-outline')}</div></section>`; }
 function emptyState(i, title, text, label, action) { return `<section class="panel empty-state"><span class="empty-state-icon">${icon(i)}</span><h2>${title}</h2><p>${text}</p>${button(label, action, 'primary', 'plus')}</section>`; }
@@ -287,10 +288,59 @@ function record(result, title, detail) {
   if (result.shield === 'downgraded') toast('Transaction included without a detected hybrid extension. Review the receipt before proceeding.', true);
   else toast(result.verified ? `${title}. Confirmed in block ${number(result.height)}.` : 'Broadcast submitted. Inclusion is pending; check the transaction receipt before retrying.');
 }
+function roleField(role, label) {
+  return `<div><label>${label} address or @handle<input name="${role}" pattern="0x[a-fA-F0-9]{40}" title="Enter a Diana EVM address, or look up and confirm the handle first." placeholder="0x… or @handle" required></label>
+    ${button('Look up ' + label.toLowerCase() + ' handle', 'lookup-' + role, 'small secondary')}
+    <div id="review-${role}" aria-live="polite"></div></div>`;
+}
+async function lookupRole(role) {
+  const input = $('#create-form').elements[role];
+  const review = $('#review-' + role);
+  review.replaceChildren();
+  const typed = input.value.trim().toLowerCase();
+  if (!/^@[a-z0-9_]{3,20}$/.test(typed)) throw Error('Enter an @handle to look up.');
+  const { handle, address } = await api('/handles/' + typed.slice(1));
+  const key = await api('/key/' + address);
+  if (!key.registered || !key.proven || key.algorithm !== 1 || key.bytes !== 2592) throw Error('This address needs a possession-proven ML-DSA-87 key on Diana.');
+  if (input.value.trim().toLowerCase() !== typed || !input.isConnected) return;
+  const pinName = 'jaydaad.handle.' + handle;
+  const previous = stored(pinName, null);
+  const changed = previous && previous !== address;
+  review.innerHTML = `<p class="address-wrap">${changed ? 'Address changed. Previously confirmed: ' + escape(previous) + '<br>' : ''}@${escape(handle)} · Diana<br><strong>${escape(address)}</strong></p><button type="button" class="btn secondary small">${changed ? 'Confirm changed address' : 'Use this address'}</button>`;
+  review.querySelector('button').onclick = () => {
+    if (input.value.trim().toLowerCase() !== typed) { review.replaceChildren(); return; }
+    save(pinName, address);
+    input.value = address;
+    review.textContent = 'Confirmed @' + handle + ' for this vault setup.';
+  };
+}
+function handoverDialog() {
+  const vault = S.vault;
+  modal('Private handover note', 'Your beneficiary can read the note as soon as they receive the encrypted file.',
+    `<form id="handover-form" data-estate="${escape(vault.estate)}" class="stack-form">
+      <p class="address-wrap">Beneficiary on Diana<br><strong>${escape(vault.heir)}</strong></p>
+      <label>Beneficiary’s signed QoreSeal recipient card<input name="card" type="file" accept=".json,application/json" required></label>
+      <label>Handover note<textarea name="note" rows="5" maxlength="8000" required></textarea></label>
+      <p class="small-copy">Ask your beneficiary to register their encryption key on Diana and share their signed card. ${link('QoreSeal recipient setup', 'https://docs.qorechain.io/developer-tools/qoreseal/', 'text-link')}</p>
+      <button class="btn primary full">Encrypt &amp; download</button></form>`);
+}
+async function exportHandover(form, data) {
+  if (data.card.size > 32768) throw Error('Choose a signed recipient card smaller than 32 KB.');
+  let card;
+  try { card = JSON.parse(await data.card.text()); } catch { throw Error('Choose a valid QoreSeal recipient card in JSON format.'); }
+  const vault = await api('/vault/' + form.dataset.estate);
+  const { publicKey } = await api('/encryption-key/' + toNative(vault.heir));
+  const packet = encryptHandover(vault, card, publicKey, data.note);
+  if (!form.isConnected || !$('#modal').open) return;
+  download('jaydaad-handover-' + vault.estate + '.json', packet);
+  form.reset();
+  closeModal();
+  toast('Encrypted handover note downloaded.');
+}
 function creationDialog() {
 
   modal(('Make room for your legacy'), ('A single beneficiary. An independent witness. Your own rhythm.'),
-    `<form id="create-form" class="stack-form"><label>Vault name<input name="name" value="My family vault" maxlength="80" required></label><div class="form-grid"><label>Beneficiary name<input name="heirName" placeholder="e.g. My sister" maxlength="80" required></label><label>Witness label<input name="witnessName" placeholder="e.g. Family adviser" maxlength="80" required></label></div>${('<label>Beneficiary EVM address<input name="heir" placeholder="0x…" pattern="0x[a-fA-F0-9]{40}" required></label><label>Witness EVM address<input name="witness" placeholder="0x…" pattern="0x[a-fA-F0-9]{40}" required></label>')}<div class="form-grid"><label>Check in every<select name="interval">${(([[86400, '1 day'], [604800, '7 days'], [2592000, '30 days'], [3600, '1 hour (test)']])).map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select></label><label>Grace period<select name="grace">${(([[86400, '1 day'], [604800, '7 days'], [1800, '30 minutes (test)']])).map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select></label></div><div class="inline-note">${icon('info')}${('Deploying needs possession-proven PQ keys for all three participants and an unscoped deployment window. Current QoreX EVM sends are not yet available; the CLI is the supported deployment path today.')}</div><button class="btn primary full" type="submit">${('Request deployment in QoreX')}${icon('arrow')}</button></form>${('<div class="modal-bottom">Already deployed? <button class="text-link" data-action="attach">Attach your vault</button> · <button class="text-link" data-action="deployment-help">CLI instructions</button></div>')}`);
+    `<form id="create-form" class="stack-form"><label>Vault name<input name="name" value="My family vault" maxlength="80" required></label><div class="form-grid"><label>Beneficiary name<input name="heirName" placeholder="e.g. My sister" maxlength="80" required></label><label>Witness label<input name="witnessName" placeholder="e.g. Family adviser" maxlength="80" required></label></div>${roleField('heir', 'Beneficiary')}${roleField('witness', 'Witness')}<div class="form-grid"><label>Check in every<select name="interval">${(([[86400, '1 day'], [604800, '7 days'], [2592000, '30 days'], [3600, '1 hour (test)']])).map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select></label><label>Grace period<select name="grace">${(([[86400, '1 day'], [604800, '7 days'], [1800, '30 minutes (test)']])).map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}</select></label></div><div class="inline-note">${icon('info')}${('Deploying needs possession-proven PQ keys for all three participants and an unscoped deployment window. Current QoreX EVM sends are not yet available; the CLI is the supported deployment path today.')}</div><button class="btn primary full" type="submit">${('Request deployment in QoreX')}${icon('arrow')}</button></form>${('<div class="modal-bottom">Already deployed? <button class="text-link" data-action="attach">Attach your vault</button> · <button class="text-link" data-action="deployment-help">CLI instructions</button></div>')}`);
 }
 function nameDialog(field) {
   const v = S.vault;
@@ -314,10 +364,12 @@ function proofDialog(action) {
 }
 function deploymentHelp() { modal('The supported contract path', 'QoreX native payments work today. Contract execution needs the CLI until QoreX ships EVM sends.', `<div class="help-content"><p>Use three fresh Diana accounts, each with a registered, possession-proven ML-DSA-87 key. Keep all key files outside the public repository.</p><pre>npm run diana:check
 npm run deploy:diana -- --config .local/diana.json
-npm run estate -- --config ${S.vault?.estate?.toLowerCase() === '0xf98a128cc7764836c8e8c6c3efbe5283ccea630d' ? '.local/qday-2026/diana.json' : '.local/diana.json'} \
-  --vault ${escape(S.vault?.estate || '0xF98A128cc7764836c8E8c6c3EFBE5283cCea630D')} --action checkin
-</pre><p>The CLI registers independent PQ keys only when requested, opens a tightly bounded deployment window, deploys, closes it, and uses vault-scoped windows for later actions. It writes public receipts to <code>deployments/</code>.</p><p>Read <code>docs/TESTNET.md</code> for the exact private configuration format and enrollment steps. Then attach the deployed address and use QoreX to add real test QOR.</p><div class="button-row">${button('Attach a deployed vault', 'attach', 'primary')}${link('QoreX documentation', 'https://docs.qorechain.io/developer-tools/qorex-integrations', 'text-link')}</div></div>`); }
+npm run estate -- checkin --config PATH_TO_VAULT_CONFIG --vault ${escape(S.vault?.estate || '0xYOUR_VAULT')}
+</pre><p>Use the private role configuration that belongs to this vault.</p><p>The CLI registers independent PQ keys only when requested, opens a tightly bounded deployment window, deploys, closes it, and uses vault-scoped windows for later actions. It writes public receipts to <code>deployments/</code>.</p><p>Read <code>docs/TESTNET.md</code> for the exact private configuration format and enrollment steps. Then attach the deployed address and use QoreX to add real test QOR.</p><div class="button-row">${button('Attach a deployed vault', 'attach', 'primary')}${link('QoreX documentation', 'https://docs.qorechain.io/developer-tools/qorex-integrations', 'text-link')}</div></div>`); }
 const actions = {
+  'lookup-heir': () => run(() => lookupRole('heir')),
+  'lookup-witness': () => run(() => lookupRole('witness')),
+  'handover-note': handoverDialog,
   menu: () => { setIndexOpen(!S.drawer); },
   'close-modal': closeModal, create: creationDialog, attach: attachDialog,
   'rename-vault': () => nameDialog('name'), 'name-beneficiary': () => nameDialog('heirName'),
@@ -381,6 +433,7 @@ document.addEventListener('submit', event => {
   event.preventDefault();
   const form = event.target, data = Object.fromEntries(new FormData(form));
   run(async () => {
+    if (form.id === 'handover-form') return exportHandover(form, data);
     if (form.id === 'name-form') {
       if (form.dataset.mode !== S.mode || form.dataset.estate !== S.vault?.estate) throw Error('The vault changed. Reopen the name editor.');
       const field = Object.hasOwn(data, 'heirName') ? 'heirName' : 'name';
@@ -415,6 +468,13 @@ document.addEventListener('submit', event => {
 window.addEventListener('hashchange', () => { S.route = location.hash.slice(1) || 'overview'; S.drawer = false; render(); window.scrollTo(0, 0); });
 window.addEventListener('focus', () => { if (S.wallet && !S.busy) run(refresh); });
 $('#modal').addEventListener('click', e => { if (e.target === $('#modal') && !S.busy) closeModal(); });
+$('#modal').addEventListener('close', () => $('#handover-form')?.reset());
+document.addEventListener('input', event => {
+  const input = event.target;
+  if (input.form?.id === 'create-form' && ['heir', 'witness'].includes(input.name)) {
+    $('#review-' + input.name).replaceChildren();
+  }
+});
 startCoverMotion();
 render();
 run(refresh);

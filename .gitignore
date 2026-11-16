@@ -14,6 +14,14 @@ test-results/
 !.env.example
 *.keystore
 *.secret.json
+*.entropy
+*.key
+
+# Private working documents and operator tools
+/docs/SUBMISSION.md
+/AI_USAGE.md
+/scripts/qday*
+/docs/audits/
 
 # Logs and local editor files
 *.log

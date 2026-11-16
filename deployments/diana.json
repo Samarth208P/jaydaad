@@ -146,8 +146,8 @@
       "type": "success"
     },
     {
-      "title": "Vault cancelled",
-      "detail": "Primary vault on Diana; EVM transaction 0xd8caad903a628fbde11f8740d9461ed55c18fefa394f7a14deca9d9f9ba418a5.",
+      "title": "Earlier vault · Vault cancelled",
+      "detail": "Earlier vault 0xC2cd7Ac4FAc9F921749E9428200aDb5eF5fEEB1a on Diana; EVM transaction 0xd8caad903a628fbde11f8740d9461ed55c18fefa394f7a14deca9d9f9ba418a5.",
       "hash": "F97B0E82FDA15AA1E3AA1CE362DD7EF777464CFFB3838A998FD7E8399D12D524",
       "evmHash": "0xd8caad903a628fbde11f8740d9461ed55c18fefa394f7a14deca9d9f9ba418a5",
       "block": 10180605,
@@ -183,7 +183,7 @@
     },
     {
       "title": "Witnessed check-in confirmed",
-      "detail": "Primary vault on Diana; EVM transaction 0xf8b43deaf433dd27dbff438f9eb4af6e51512fd78579bcecd5448751663ff148.",
+      "detail": "Primary vault 0xF98A128cc7764836c8E8c6c3EFBE5283cCea630D on Diana; EVM transaction 0xf8b43deaf433dd27dbff438f9eb4af6e51512fd78579bcecd5448751663ff148.",
       "hash": "52F7B9BE5C16E350C8A5B0AA60B15B414A193214FF9708C2F21758FF872DCCA3",
       "evmHash": "0xf8b43deaf433dd27dbff438f9eb4af6e51512fd78579bcecd5448751663ff148",
       "block": 10180592,
@@ -219,7 +219,7 @@
     },
     {
       "title": "Inheritance vault deployed",
-      "detail": "Primary vault on Diana; EVM transaction 0x1de2f3c8717e1971cadb6466694e3ee0d8122896a6af7853a4635afb0f7bbb4f.",
+      "detail": "Primary vault 0xF98A128cc7764836c8E8c6c3EFBE5283cCea630D on Diana; EVM transaction 0x1de2f3c8717e1971cadb6466694e3ee0d8122896a6af7853a4635afb0f7bbb4f.",
       "hash": "D272F58FBD9285508E7B28963FDCC05DB38E35E371A0DA60917C617FC5C696B0",
       "evmHash": "0x1de2f3c8717e1971cadb6466694e3ee0d8122896a6af7853a4635afb0f7bbb4f",
       "block": 10180573,
@@ -266,8 +266,8 @@
       "type": "success"
     },
     {
-      "title": "Witnessed check-in confirmed",
-      "detail": "Primary vault on Diana; EVM transaction 0x1288c380fd0e0747ffb48b7aad9581d4388a5c9b1022c559f99e255abc314c06.",
+      "title": "Earlier vault · Witnessed check-in confirmed",
+      "detail": "Earlier vault 0xC2cd7Ac4FAc9F921749E9428200aDb5eF5fEEB1a on Diana; EVM transaction 0x1288c380fd0e0747ffb48b7aad9581d4388a5c9b1022c559f99e255abc314c06.",
       "hash": "F9E4B1055B86B8159D23FDA419403163122BFEACFFDC5E79007A3AC061B35093",
       "evmHash": "0x1288c380fd0e0747ffb48b7aad9581d4388a5c9b1022c559f99e255abc314c06",
       "block": 10180182,
@@ -302,8 +302,8 @@
       "type": "success"
     },
     {
-      "title": "Inheritance vault deployed",
-      "detail": "Primary vault on Diana; EVM transaction 0xff3f240ea86a07110eb461b6e9c5a4643a98e82183809b479cbc9c78df30f3b2.",
+      "title": "Earlier vault · Inheritance vault deployed",
+      "detail": "Earlier vault 0xC2cd7Ac4FAc9F921749E9428200aDb5eF5fEEB1a on Diana; EVM transaction 0xff3f240ea86a07110eb461b6e9c5a4643a98e82183809b479cbc9c78df30f3b2.",
       "hash": "D5BF6826E92B3ECA010D00452DF202720A323A68EC773C0A6FA7250510F0BC0D",
       "evmHash": "0xff3f240ea86a07110eb461b6e9c5a4643a98e82183809b479cbc9c78df30f3b2",
       "block": 10180161,
@@ -399,7 +399,7 @@
     },
     {
       "title": "Beneficiary payout completed",
-      "detail": "Short-timer demo on Diana; EVM transaction 0xd81e0c8a7f2be059cef84cefdcf006240828be05d60ccaf9fc048aff420897e7.",
+      "detail": "Short-timer demo 0x91E8E55A52113D2Fdc2c3f13d3fC5A735632D4A4 on Diana; EVM transaction 0xd81e0c8a7f2be059cef84cefdcf006240828be05d60ccaf9fc048aff420897e7.",
       "hash": "D04C4E9DD8E6F644C3ED3ECB3E935A76D10848EE7FE3FA9D75985C857EBC199F",
       "evmHash": "0xd81e0c8a7f2be059cef84cefdcf006240828be05d60ccaf9fc048aff420897e7",
       "block": 10072532,
@@ -447,7 +447,7 @@
     },
     {
       "title": "Payout demo activated",
-      "detail": "Short-timer demo on Diana; EVM transaction 0xd9c3733d53ea4de3b519ab9763dc78312361c48de1427df4e61eb02463375c14.",
+      "detail": "Short-timer demo 0x91E8E55A52113D2Fdc2c3f13d3fC5A735632D4A4 on Diana; EVM transaction 0xd9c3733d53ea4de3b519ab9763dc78312361c48de1427df4e61eb02463375c14.",
       "hash": "BA643CCB3BD5A2F1F9B22EA358F6FF0D2CB64D08B9A5DBB11A6039B1034B3A4D",
       "evmHash": "0xd9c3733d53ea4de3b519ab9763dc78312361c48de1427df4e61eb02463375c14",
       "block": 10072424,
@@ -483,7 +483,7 @@
     },
     {
       "title": "Payout demo deployed",
-      "detail": "Short-timer demo on Diana; EVM transaction 0x623d986dd7e081db97b0a174327c2ec49ea6808c2b6fafe0a75f75574f825027.",
+      "detail": "Short-timer demo 0x91E8E55A52113D2Fdc2c3f13d3fC5A735632D4A4 on Diana; EVM transaction 0x623d986dd7e081db97b0a174327c2ec49ea6808c2b6fafe0a75f75574f825027.",
       "hash": "E3C90503D8BD268C953213940598569CAE1FCBE72BFDEC4E392880F80A65A7F0",
       "evmHash": "0x623d986dd7e081db97b0a174327c2ec49ea6808c2b6fafe0a75f75574f825027",
       "block": 10072377,
@@ -530,8 +530,8 @@
       "type": "success"
     },
     {
-      "title": "Witnessed check-in confirmed",
-      "detail": "Primary vault on Diana; EVM transaction 0x9194da507c3115d52fd4b706189e14e5d294feeaa6bf22728129c7430c8d620f.",
+      "title": "Earlier vault · Witnessed check-in confirmed",
+      "detail": "Earlier vault 0xA3a1e281C4Cf7fD73b922a074f9e59e666503b10 on Diana; EVM transaction 0x9194da507c3115d52fd4b706189e14e5d294feeaa6bf22728129c7430c8d620f.",
       "hash": "514690427974CC44D0EFA2C4BF02C16E76B852E227F63F304C2D7DD1744CC7E6",
       "evmHash": "0x9194da507c3115d52fd4b706189e14e5d294feeaa6bf22728129c7430c8d620f",
       "block": 10072321,
@@ -566,8 +566,8 @@
       "type": "success"
     },
     {
-      "title": "Inheritance vault deployed",
-      "detail": "Primary vault on Diana; EVM transaction 0xe7987b2f54360140840b364cdeb274e40d1d05cd62ee19dd150d2e2a8fdaa9a5.",
+      "title": "Earlier vault · Inheritance vault deployed",
+      "detail": "Earlier vault 0xA3a1e281C4Cf7fD73b922a074f9e59e666503b10 on Diana; EVM transaction 0xe7987b2f54360140840b364cdeb274e40d1d05cd62ee19dd150d2e2a8fdaa9a5.",
       "hash": "B65B0E1791FBCEFF7C2E8A5AD06A3E3236700D5CEF1A5E32AA2E5B7DD7AC893E",
       "evmHash": "0xe7987b2f54360140840b364cdeb274e40d1d05cd62ee19dd150d2e2a8fdaa9a5",
       "block": 10072303,

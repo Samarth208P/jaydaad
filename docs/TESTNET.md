@@ -6,12 +6,7 @@ into the browser application.
 
 ## Run the application
 
-This checkout is configured with a live primary vault at
-`0xA3a1e281C4Cf7fD73b922a074f9e59e666503b10`. It holds 1 test QOR, is Active,
-and uses a 30-day check-in interval plus 7-day grace. The app reads
-`deployments/diana.json` and attaches it automatically when no other vault is
-selected. A separate short-timer demo completed a real 0.25-QOR payout; its
-receipt and fee-adjusted balance proof are under `deployments/`.
+The dashboard loads the primary vault from [the deployment manifest](../deployments/diana.json). Its snapshot records the block and time of observation. The dashboard queries Diana for the current balance and phase.
 
 ```sh
 npm ci
@@ -52,8 +47,7 @@ method succeeded, or labels a local Hardhat action a live testnet transaction.
 
 ## Prepare disposable CLI identities
 
-The current local identities already exist and are registered. Do not run
-`init` again for the existing deployment. The steps below explain fresh setup.
+Run the following steps for a fresh testnet vault. Use the existing role configuration when operating a deployed vault.
 On Windows PowerShell, use `node scripts/diana-cli.js ...` if the `npm.ps1`
 wrapper consumes command flags; this is the direct CLI path used for deployment.
 
@@ -203,9 +197,9 @@ npm run estate -- --config .local/diana.json --vault 0xYOUR_VAULT --action recov
 
 The command uses the owner's configured account to pay gas; the contract's fixed
 payout recipient receives the coins. Save the public receipt files, compare
-before/after balances, and add actual explorer links to your submission.
+balances before and after settlement, and verify the transaction in the Diana explorer.
 
-## Evidence and things not yet verified
+## Public deployment evidence
 
 The repository contains public live deployment, hybrid-native funding,
 possession-proven enrollment, scoped-window, check-in, and beneficiary-payout
@@ -213,10 +207,25 @@ receipts. Secret files remain under ignored `.local/`. The 0.25-QOR payout was
 reconciled exactly against the heir's balance after native-window fees and EVM
 gas. The app starts with the live primary vault configured.
 
-The CLI used the three local disposable role keys; it did not verify independent
-human liveness. A real QoreX extension approval is still separate evidence, as
-are the official QCAI reports and any public deployment of the website. Tests
-against the wallet API test double do not substitute for those results.
+The recorded operations used disposable role keys on one device. Browser tests use a wallet test double. The checked-in funding receipt was signed by the CLI.
+
+## Handle lookup
+
+In vault setup, enter an @handle in the beneficiary or witness field, then choose **Look up**. Review the full Diana EVM address and choose **Use this address**. A changed address is shown alongside the previously confirmed address on this device. You can also copy the resolved address when configuring a CLI deployment. Confirm that it matches the corresponding role printed by the CLI.
+
+The local gateway uses the public registry and pinned Ed25519 key shipped with the [QoreX Firefox 0.4.2 release](https://addons.mozilla.org/firefox/downloads/file/5231089/qorex-0.4.2.xpi). The package checks both signatures. Jaydaad additionally checks the requested handle, the address derived from the signed owner key, and the account’s possession-proven Diana signing key. A handle without a matching EVM account cannot be used for this lookup. Raw Diana addresses remain available. [Handles documentation](https://docs.qorechain.io/developer-tools/chain-bridge/)
+
+## Private handover notes
+
+The beneficiary first registers an ML-KEM-1024 public key on Diana and supplies a signed QoreSeal recipient card for their enrolled account. Signing-key enrollment alone is insufficient. Use the QoreSeal account setup to create and sign the card and keep its corresponding encryption seed private. [Recipient setup](https://docs.qorechain.io/developer-tools/qoreseal/)
+
+In the Beneficiary view, choose **Create private handover note**, select the card JSON, enter the note, and download the encrypted file. The browser verifies the card and encrypts locally. Share the downloaded JSON with the beneficiary over a channel where they can verify who sent it. The envelope protects the contents and binds them to a vault address. It does not authenticate the author or delay reading until payout.
+
+The beneficiary opens the file offline with their original 32-byte QoreSeal encryption seed, stored as hex in a private file. Use a fresh output filename. The command writes plaintext there.
+
+~~~sh
+npm run note:open -- handover.json .local/recipient-seal-seed.key .local/handover.txt
+~~~
 
 Official references: [QoreX integrations](https://docs.qorechain.io/developer-tools/qorex-integrations),
 [EVM window reference](https://docs.qorechain.io/developer-guide/evm-window-reference),

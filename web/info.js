@@ -89,7 +89,6 @@ export function compactInformation(root, { phase } = {}) {
     }
   });
   root.querySelectorAll('.event-cell').forEach(cell => one(cell, 'p', 'this transaction', { host: cell.querySelector('strong') }));
-  root.querySelectorAll('.drill-check').forEach(row => one(row, 'p', 'this security check', { host: row.querySelector('strong') }));
 
   // Group each panel's supporting copy into one contextual button.
   root.querySelectorAll('section.panel').forEach(panel => {

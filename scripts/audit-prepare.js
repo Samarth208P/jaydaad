@@ -13,5 +13,5 @@ await writeFile(name + '.json', JSON.stringify({ stage: values.stage, status: 'i
   preparedAt: new Date().toISOString(), sha256: hash, source: 'contracts/JaydaadEstate.sol', compiler: '0.8.30',
   evmVersion: 'paris', optimizerRuns: 200, officialAuditor: 'https://dashboard.qorechain.io/audit',
   reportUrl: null, findings: null,
-  instructions: 'Paste the exact adjacent Solidity source into QCAI. Preserve the public report URL and PDF. Resolve findings before stage-2. A code change requires a new source hash and re-audit.' }, null, 2));
+  instructions: 'Review the adjacent source and record findings against its SHA-256 digest.' }, null, 2));
 console.log(`Prepared ${values.stage} source ${hash}. No audit was performed. Upload ${name}.sol to the official auditor.`);

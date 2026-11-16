@@ -59,7 +59,9 @@ try {
       shield = record.action === 'deploy' ? 'window-authorized' : 'contract-verified';
       const isDemo = record.estate?.toLowerCase() === demo.toLowerCase();
       title = ({ deploy: isDemo ? 'Payout demo deployed' : 'Inheritance vault deployed', checkin: isDemo ? 'Payout demo activated' : 'Witnessed check-in confirmed', claim: 'Beneficiary payout completed', cancel: 'Vault cancelled', fund: 'Vault funded' })[record.action] || record.action;
-      detail = `${isDemo ? 'Short-timer demo' : 'Primary vault'} on Diana; EVM transaction ${record.hash}.`;
+      const label = isDemo ? 'Short-timer demo' : record.estate.toLowerCase() === primary.toLowerCase() ? 'Primary vault' : 'Earlier vault';
+      if (label === 'Earlier vault') title = 'Earlier vault · ' + title;
+      detail = `${label} ${record.estate} on Diana; EVM transaction ${record.hash}.`;
       verified.push({ ...record, nativeHash: hash, height, verified: true, feeWei: receipt.fee.toString() });
     }
     if (!time) time = new Date((await provider.getBlock(height)).timestamp * 1000).toISOString();

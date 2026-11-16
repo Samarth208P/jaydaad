@@ -10,11 +10,11 @@ their possession-proven ML-DSA-87 key hashes. Secret files are ignored under
 `.local/`, outside this directory.
 
 `diana-<timestamp>.json` files contain the CLI's actual public operation receipts.
-`diana.json` rechecks all 22 receipts against Diana, maps EVM hashes to their
+`diana.json` records receipts checked against Diana, maps EVM hashes to their
 native wrapper hashes, and configures the app's primary vault. It also records
 the closed short-timer payout demo. `payout-accounting.json` reconciles the
 0.25-QOR payout exactly, including native and EVM fees. `diana-security.json`
-records four real read-only rejection simulations against the primary vault.
+records four real read-only rejection simulations against the vault named in that file.
 Never place secret keys, mnemonics, or PQ entropy in this directory.
 
 The current public explorer chooses its network through a persistent network
